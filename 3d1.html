@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=640, target-densitydpi=device-dpi, user-scalable=no"/>
+	<title>Document</title>
+	<script>
+		var imgData=[
+			'./outerImg/1.png',
+			'./outerImg/2.png',
+			'./outerImg/3.png',
+			'./outerImg/4.png',
+			'./outerImg/5.png',
+			'./outerImg/6.png',
+			'./outerImg/7.png',
+			'./outerImg/8.png',
+			'./outerImg/9.png',
+			'./outerImg/10.png',
+			'./outerImg/11.png',
+			'./outerImg/12.png',
+			'./outerImg/13.png',
+			'./outerImg/14.png',
+			'./outerImg/15.png',
+			'./outerImg/16.png',
+			'./outerImg/17.png',
+			'./outerImg/18.png',
+			'./outerImg/19.png',
+			'./outerImg/20.png',
+			'./outerImg/21.png',
+			'./outerImg/22.png',
+			'./outerImg/23.png',
+			'./outerImg/24.png',
+			'./outerImg/25.png',
+			'./outerImg/26.png',
+			'./outerImg/27.png',
+			'./outerImg/28.png',
+			'./outerImg/29.png',
+			'./outerImg/30.png'
+		]
+	</script>
+</head>
+<style>
+	*{
+		margin:0;
+		padding:0;
+	}
+	html,body{
+		width: 100%;
+		height: 100%;
+		/* background: #B5DB50; */
+	}
+	.main{
+		position: absolute;
+		top:0;
+		left:0;
+		width: 640px;
+		height: 100%;
+		overflow: hidden;
+	}
+	.three{
+		width: 640px;
+		height: 100%;
+		transform-style: preserve-3d;
+		perspective: 1000px;
+	}
+	/*主3d容器*/
+	.box_3d{
+		position: absolute;
+		left: 50%;
+		top:50%;
+		transform: translate3d(-50%,-50%,980px);
+		transform-style: preserve-3d;
+		transform-origin: 50% 50% 0px;
+		width: 10px;
+		height: 10px;
+		background: red;
+	}
+	.test{
+		width: 107px;
+		height: 1366px;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform-origin: 50% 50% 0px;
+		
+	}
+</style>
+<body>
+	<div class="aaa" style="position:fixed;top:0;left:0;z-index:100;">
+
+	</div>
+	<div class="main">
+		<div class="three">
+			<div class="box_3d">
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+!function(){
+	/**
+	 * [art 计算Z轴偏移量]
+	 * @param  {[Number]} len [单边长度]
+	 * @param  {[Number]} num [边的数量]
+	 * @return {[Number]}     [Z轴偏移量]
+	 */
+	function art(len,num){
+		var angle=Math.PI/num;//角度的一半转换为弧度
+		return Math.round( len/( 2*Math.tan(angle) ) );
+	}
+	console.log( art(100,30) );
+
+	var threeD={
+		init:function(){
+			this.loadImg(imgData);
+		},
+		//加载图片
+		loadImg:function(imgData){
+			var This=this,len=imgData.length,imgC=0,score;
+			for (var i = 0; i < len; i++) {
+				img=new Image();
+				img.src= imgData[i];
+				img.onload=function(){
+					imgC++;
+					console.log( Math.round( (imgC/len)*100 ) );
+					if (imgC===len){
+						This.create(len);
+						//延时遮罩消失
+						setTimeout(function(){
+							console.log('遮罩消失');
+						},1000)
+					}
+				}
+				
+			}
+		},
+		//生成场景
+		create:function(len){
+			var This=this,box=document.createDocumentFragment(),
+			outerZ=art(100,30),rotateAng=360/30;
+
+			for (var i = 0; i < len; i++) {
+				var out=document.createElement('div');
+				
+				out.style.cssText="transform: translate3d(-50%,-50%,0) rotateY("+(-rotateAng*i)+"deg) translate3d(0px, 0px, "+(-outerZ-26)+"px) scale3d(1, 1, 1);background:url(./outerImg/"+(i+1)+".png) no-repeat;"
+				out.classList.add('test');
+				box.appendChild(out);
+			}
+			document.querySelector('.box_3d').appendChild(box);
+		}
+	}
+	threeD.init();
+
+}()
+
+
+
+/*window.addEventListener('deviceorientation', function(event) {
+    var alpha = event.alpha;
+    var beta = event.beta;
+    var gamma = event.gamma;
+    if (alpha) {
+    	document.querySelector('.aaa').innerHTML="<h1>Z "+alpha.toFixed(2)+" X "+beta.toFixed(2)+" Y "+gamma.toFixed(2)+"</h1>";
+	    document.querySelector('.box_3d').style.transform=' translate3d(-50%,-50%,980px) \
+														    rotateX('+ beta.toFixed(2) +'deg) \
+														    rotateY('+ -gamma.toFixed(2)*2 +'deg)';
+    }
+
+}, false);*/
+var rX=0,
+rY=0;//初始 XY轴旋转角
+document.addEventListener('touchstart',startEvent,false);
+
+function startEvent(e){
+	var X=e.touches[0].pageX,
+	Y=event.touches[0].pageY;
+	
+	function moveEvent(e){
+		var x=e.touches[0].pageX,
+		y=event.touches[0].pageY;
+		console.log(X-x);
+		rX=-(Y-y)/20;
+		rY=(X-x)/20;
+
+	    document.querySelector('.box_3d').style.transform=' translate3d(-50%,-50%,980px) \
+														    rotateX('+ rX +'deg) \
+														    rotateY('+ rY +'deg)';
+	}
+	function upEvent(e){
+		document.removeEventListener('touchmove');
+	    document.querySelector('.box_3d').style.transform=' translate3d(-50%,-50%,980px) \
+														    rotateX('+ rX +'deg) \
+														    rotateY('+ rY +'deg)';
+	}
+
+	document.addEventListener('touchmove',moveEvent,false);
+	document.addEventListener('touchup',upEvent,false)
+}
+
+
+/*window.addEventListener('touchstart',function(e){
+
+
+},false);*/
+
+
+
+/*window.addEventListener('click', function(event) {
+console.log(document.querySelector('.box_3d')) 
+    document.querySelector('.box_3d').style.transform='translateX(100px)'
+}, false);*/
+
+</script>
+</html>

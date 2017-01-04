@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=640, target-densitydpi=device-dpi, user-scalable=no"/>
+	<title>Document</title>
+	<script>
+		var imgData=[
+			'./outerImg/1.png',
+			'./outerImg/2.png',
+			'./outerImg/3.png',
+			'./outerImg/4.png',
+			'./outerImg/5.png',
+			'./outerImg/6.png',
+			'./outerImg/7.png',
+			'./outerImg/8.png',
+			'./outerImg/9.png',
+			'./outerImg/10.png',
+			'./outerImg/11.png',
+			'./outerImg/12.png',
+			'./outerImg/13.png',
+			'./outerImg/14.png',
+			'./outerImg/15.png',
+			'./outerImg/16.png',
+			'./outerImg/17.png',
+			'./outerImg/18.png',
+			'./outerImg/19.png',
+			'./outerImg/20.png',
+			'./outerImg/21.png',
+			'./outerImg/22.png',
+			'./outerImg/23.png',
+			'./outerImg/24.png',
+			'./outerImg/25.png',
+			'./outerImg/26.png',
+			'./outerImg/27.png',
+			'./outerImg/28.png',
+			'./outerImg/29.png',
+			'./outerImg/30.png'
+		]
+	</script>
+</head>
+<style>
+	*{
+		margin:0;
+		padding:0;
+	}
+	html,body{
+		width: 100%;
+		height: 100%;
+		/* background: #B5DB50; */
+	}
+	.main{
+		position: absolute;
+		top:0;
+		left:0;
+		width: 640px;
+		height: 100%;
+		overflow: hidden;
+	}
+	.three{
+		width: 640px;
+		height: 100%;
+		transform-style: preserve-3d;
+		perspective: 1000px;
+	}
+	/*主3d容器*/
+	.box_3d{
+		position: absolute;
+		left: 50%;
+		top:50%;
+		transform: translate3d(-50%,-50%,600px);
+		transform-style: preserve-3d;
+		transform-origin: 50% 50% 0px;
+		width: 10px;
+		height: 10px;
+		background: red;
+	}
+	.test{
+		width: 107px;
+		height: 1366px;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform-origin: 50% 50% 0px;
+		
+	}
+</style>
+<body>
+	<div class="aaa" style="position:fixed;top:0;left:0;z-index:100;">
+
+	</div>
+	<div class="main">
+		<div class="three">
+			<div class="box_3d">
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+!function(w,d){
+	/**
+	 * [getDom]
+	 * @param  {[String]} ele 
+	 * @return {[DOM]} 
+	 */
+	function getDom(ele){
+		return typeof ele=='string' ? d.querySelector(ele) : '';
+	}
+	/**
+	 * [art 计算Z轴偏移量]
+	 * @param  {[Number]} len [单边长度]
+	 * @param  {[Number]} num [边的数量]
+	 * @return {[Number]}     [Z轴偏移量]
+	 */
+	function art(len,num){
+		var angle=Math.PI/num;//角度的一半转换为弧度
+		return Math.round( len/( 2*Math.tan(angle) ) );
+	}
+	console.log( art(100,30) );
+
+	var isMobile=/mobile/gi.test( navigator.userAgent.toLowerCase() );
+	//Main
+	var threeD={
+		mainBox:getDom('.box_3d'),
+		init:function(){
+			this.loadImg(imgData);
+		},
+		//加载图片
+		loadImg:function(imgData){
+			var This=this,len=imgData.length,imgC=0,score;
+			for (var i = 0; i < len; i++) {
+				img=new Image();
+				img.src= imgData[i];
+				img.onload=function(){
+					imgC++;
+					console.log( Math.round( (imgC/len)*100 ) );
+					if (imgC===len){
+						This.create(len);
+						//延时遮罩消失
+						setTimeout(function(){
+							console.log('遮罩消失');
+						},1000)
+					}
+				}
+				
+			}
+		},
+		//生成场景
+		create:function(len){
+			var This=this,box=d.createDocumentFragment(),
+			outerZ=art(100,30),rotateAng=360/30;
+
+			for (var i = 0; i < len; i++) {
+				var out=d.createElement('div');
+				
+				out.style.cssText="transform: translate3d(-50%,-50%,0) rotateY("+(-rotateAng*i)+"deg) translate3d(0px, 0px, "+(-outerZ-26)+"px) scale3d(1, 1, 1);background:url(./outerImg/"+(i+1)+".png) no-repeat;"
+				out.classList.add('test');
+				box.appendChild(out);
+			}
+			This.mainBox.appendChild(box);
+			This.eListener();
+		},
+		//事件类型
+		evs:isMobile?{
+	        down: 'touchstart',
+	        move: 'touchmove',
+	        up: 'touchend'
+	    } : {
+	        down: 'mousedown',
+	        move: 'mousemove',
+	        up: 'mouseup'
+	    },
+		eListener:function(){
+			console.log(this.evs)
+			var This=this,rX=0,rY=0,//初始 XY轴旋转角 用来保存旋转的之前状态
+			chaX=0,chaY=0,//保存 当前旋转差值
+			gyroscope=true;//陀螺仪开关
+			d.addEventListener(This.evs.down,startEvent,false);
+			function startEvent(e){
+				e.preventDefault();
+				//alert(1)
+				gyroscope=false;//禁陀螺仪
+				var X=isMobile ? e.touches[0].pageX : e.pageX,
+				Y=isMobile ? e.touches[0].pageY : e.pageY;
+
+				function moveEvent(e){
+					e.preventDefault();
+					//alert(2)
+					var x=isMobile ? e.touches[0].pageX : e.pageX,
+					y=isMobile ? e.touches[0].pageY : e.pageY;
+					//console.log(X-x);
+					chaX=-(Y-y)/10;
+					chaY=(X-x)/10;
+					//console.log('chaY',chaY)
+				    d.querySelector('.box_3d').style.transform=' translate3d(-50%,-50%,600px) rotateX('+ (rX+chaX) +'deg) rotateY('+ (rY+chaY) +'deg)';
+				}
+				function upEvent(e){
+					//alert();
+				    rX+=chaX;
+				    rY+=chaY;
+				    //console.log('rY',rY)
+					
+				    d.querySelector('.box_3d').style.transform=' translate3d(-50%,-50%,600px) rotateX('+ rX +'deg) rotateY('+ rY +'deg)';
+				    d.removeEventListener('touchmove',moveEvent,false);
+				    d.removeEventListener('touchend',upEvent,false);
+				    gyroscope=true;//开陀螺仪
+
+				}
+
+				d.addEventListener(This.evs.move,moveEvent,false);
+				d.addEventListener(This.evs.up,upEvent,false);
+			}
+			//陀螺仪
+			w.addEventListener('deviceorientation', function(event) {
+			    var alpha = event.alpha;//Z轴
+			    var beta = event.beta;//X轴
+			    var gamma = event.gamma;//Y轴
+			    event.preventDefault();
+			    if (alpha && gyroscope) {
+			    	d.querySelector('.aaa').innerHTML="<h1>Z "+alpha.toFixed(2)+" X "+beta.toFixed(2)+" Y "+gamma.toFixed(2)+"</h1>";
+				    d.querySelector('.box_3d').style.transform=' translate3d(-50%,-50%,600px) rotateX('+ beta.toFixed(2) +'deg) rotateY('+ -gamma.toFixed(2)*2 +'deg)';
+			    }
+
+			}, false);
+
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	}
+	threeD.init();
+
+}(window,document)
+
+
+</script>
+</html>

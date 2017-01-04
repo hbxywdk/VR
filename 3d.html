@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=640, target-densitydpi=device-dpi, user-scalable=no"/>
+	<title>Document</title>
+</head>
+<style>
+	*{
+		margin:0;
+		padding:0;
+	}
+	html,body{
+		width: 100%;
+		height: 100%;
+	}
+	.main{
+		position: absolute;
+		top:0;
+		left:0;
+		width: 640px;
+		height: 100%;
+		overflow: hidden;
+	}
+	.three{
+		width: 640px;
+		height: 100%;
+		background: #ccc;
+		transform-style: preserve-3d;
+		perspective: 800px;
+	}
+	/*主3d容器*/
+	.box_3d{
+		position: absolute;
+		left: 50%;
+		top:50%;
+		transform: translate3d(-50%,-50%,765px) rotateX(0deg);
+		transform-style: preserve-3d;
+		transform-origin: 50% 50% 0px;
+	}
+	.test1,.test2,.test3,.test4,.test5,.test6{
+		width: 100px;
+		height: 100px;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform-origin: 50% 50% 0px;
+		
+	}
+	.test1{
+		background: red;
+		transform:  translate3d(-50%,-50%,0) rotateY(0deg) translate3d(0px, 0px, 87px) scale3d(1, 1, 1);
+	}
+	.test2{
+		background: blue;
+		transform: translate3d(-50%,-50%,0) rotateY(60deg) translate3d(0px, 0px, 87px)  scale3d(1, 1, 1) ;
+	}
+	.test3{
+		background: orange;
+		transform: translate3d(-50%,-50%,0) rotateY(120deg) translate3d(0px, 0px, 87px)  scale3d(1, 1, 1) ;
+	}
+	.test4{
+		background: #000;
+		transform: translate3d(-50%,-50%,0) rotateY(180deg) translate3d(0px, 0px, 87px)  scale3d(1, 1, 1) ;
+	}
+	.test5{
+		background: pink;
+		transform: translate3d(-50%,-50%,0) rotateY(240deg) translate3d(0px, 0px, 87px)  scale3d(1, 1, 1) ;
+	}
+	.test6{
+		background: #2eaae2;
+		transform: translate3d(-50%,-50%,0) rotateY(300deg) translate3d(0px, 0px, 87px)  scale3d(1, 1, 1) ;
+	}
+</style>
+<body>
+	<div class="aaa" style="position:fixed;top:0;left:0;z-index:100;">
+
+	</div>
+	<div class="main">
+		<div class="three">
+			<div class="box_3d">
+				<div class="test1">
+
+				</div>
+				<div class="test2">
+
+				</div>
+				<div class="test3"></div>
+				<div class="test4"></div>
+				<div class="test5"></div>
+				<div class="test6"></div>
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+window.addEventListener('deviceorientation', function(event) {
+    var alpha = event.alpha;
+    var beta = event.beta;
+    var gamma = event.gamma;
+    document.querySelector('.aaa').innerHTML="<h1>Z "+alpha.toFixed(2)+" X "+beta.toFixed(2)+" Y "+gamma.toFixed(2)+"</h1>";
+    document.querySelector('.box_3d').style.transform=' translate3d(-50%,-50%,765px) \
+													    rotateX(0deg) \
+													    rotateY('+ gamma.toFixed(2)*5 +'deg)';
+													    //translateX('+ gamma.toFixed(2)*5 +'px) \
+}, false);
+/*window.addEventListener('click', function(event) {
+console.log(document.querySelector('.box_3d')) 
+    document.querySelector('.box_3d').style.transform='translateX(100px)'
+}, false);*/
+/**
+ * [art 计算Z轴偏移量]
+ * @param  {[Number]} len [单边长度]
+ * @param  {[Number]} num [边的数量]
+ * @return {[Number]}     [Z轴偏移量]
+ */
+function art(len,num){
+	var angle=Math.PI/num;//角度的一半转换为弧度
+	return Math.round( len/( 2*Math.tan(angle) ) );
+}
+console.log( art(100,6) );
+</script>
+</html>
